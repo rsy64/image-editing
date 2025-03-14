@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Free online image editing tool to add or replace text on images. Optimized for SEO and user-friendly.">
+  <meta name="keywords" content="image editor, text on image, free image editing, online image tool">
+  <title>Image Text Editor - Add/Replace Text on Images</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #333;
+    }
+
+    header {
+      background: linear-gradient(135deg, #6200ea, #3700b3);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 1rem;
+    }
+
+    .tool-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+      gap: 15px;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="file"], textarea, button, .drag-drop-area {
+      margin: 10px 0;
+      padding: 12px;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"]:hover, textarea:hover, button:hover, .drag-drop-area:hover {
+      border-color: #6200ea;
+    }
+
+    button {
+      background: linear-gradient(135deg, #6200ea, #3700b3);
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #3700b3, #6200ea);
+    }
+
+    .drag-drop-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      border: 2px dashed #6200ea;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      color: #6200ea;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .drag-drop-area.dragover {
+      background-color: #e0e0ff;
+    }
+
+    .drag-drop-area i {
+      font-size: 1.5rem;
+    }
+
+    .text-customization {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+      align-items: center;
+    }
+
+    .text-customization label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .text-customization input, .text-customization select {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .canvas-container {
+      text-align: center;
+      margin: 20px;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    canvas {
+      border: 1px solid #ddd;
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .layer {
+      position: absolute;
+      cursor: grab;
+    }
+
+    .layer img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .layer-gallery {
+      margin-top: 20px;
+      padding: 15px;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .layer-gallery h3 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+      color: #6200ea;
+    }
+
+    .gallery-items {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .gallery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border: 2px dashed #6200ea;
+      border-radius: 8px;
+      cursor: grab;
+      background-color: #f8f9fa;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .gallery-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .gallery-item i {
+      font-size: 1.5rem;
+      color: #6200ea;
+    }
+
+    .gallery-item span {
+      margin-top: 5px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background-color: #333;
+      color: white;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .tool-container {
+        width: 100%;
+        padding: 15px;
+      }
+
+      input[type="file"], textarea, button, .drag-drop-area {
+        width: 100%;
+      }
+
+      .text-customization {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Image Text Editor</h1>
+    <p>Add or replace text on your images easily!</p>
+  </header>
+
+  <main>
+    <div class="tool-container">
+      <input type="file" id="imageUpload" accept="image/*">
+      <div class="drag-drop-area" id="dragDropArea">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Drag & Drop an image here</p>
+      </div>
+      <textarea id="textInput" placeholder="Enter text to add on the image"></textarea>
+      <div class="text-customization">
+        <label for="fontSize">Font Size:</label>
+        <input type="number" id="fontSize" value="30" min="10" max="100">
+        <label for="fontColor">Font Color:</label>
+        <input type="color" id="fontColor" value="#ffffff">
+        <label for="fontStyle">Font Style:</label>
+        <select id="fontStyle">
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+        </select>
+      </div>
+      <button id="addTextBtn"><i class="fas fa-text-height"></i> Add Text</button>
+      <button id="undoBtn"><i class="fas fa-undo"></i> Undo</button>
+      <button id="redoBtn"><i class="fas fa-redo"></i> Redo</button>
+      <button id="downloadBtn"><i class="fas fa-download"></i> Download</button>
+      <button id="shareBtn"><i class="fas fa-share-alt"></i> Share</button>
+
+      <div class="layer-gallery">
+        <h3>Add Layers</h3>
+        <div class="gallery-items">
+          <div class="gallery-item" data-type="image" data-src="https://via.placeholder.com/100">
+            <img src="https://via.placeholder.com/100" alt="Layer 1">
+          </div>
+          <div class="gallery-item" data-type="text" data-text="Sample Text">
+            <i class="fas fa-text-height"></i>
+            <span>Text</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="canvas-container">
+      <canvas id="imageCanvas"></canvas>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Image Text Editor. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const textInput = document.getElementById('textInput');
+    const addTextBtn = document.getElementById('addTextBtn');
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const dragDropArea = document.getElementById('dragDropArea');
+
+    let image = null;
+    let history = [];
+    let historyIndex = -1;
+
+    // Load image
+    imageUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        image = new Image();
+        image.src = event.target.result;
+        image.onload = () => {
+          canvas.width = image.width;
+          canvas.height = image.height;
+          ctx.drawImage(image, 0, 0);
+          saveState();
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Drag and drop
+    dragDropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dragDropArea.classList.add('dragover');
+    });
+
+    dragDropArea.addEventListener('dragleave', () => {
+      dragDropArea.classList.remove('dragover');
+    });
+
+    dragDropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dragDropArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          image = new Image();
+          image.src = event.target.result;
+          image.onload = () => {
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+            saveState();
+          };
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please upload a valid image file.');
+      }
+    });
+
+    // Add text
+    addTextBtn.addEventListener('click', () => {
+      if (!image) {
+        alert('Please upload an image first.');
+        return;
+      }
+      const text = textInput.value;
+      if (!text) {
+        alert('Please enter some text.');
+        return;
+      }
+      ctx.font = `${document.getElementById('fontSize').value}px ${document.getElementById('fontStyle').value}`;
+      ctx.fillStyle = document.getElementById('fontColor').value;
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.textAlign = 'center';
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+      ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+      saveState();
+    });
+
+    // Undo/Redo
+    function saveState() {
+      historyIndex++;
+      history[historyIndex] = canvas.toDataURL();
+      history = history.slice(0, historyIndex + 1);
+    }
+
+    undoBtn.addEventListener('click', () => {
+      if (historyIndex > 0) {
+        historyIndex--;
+        const img = new Image();
+        img.src = history[historyIndex];
+        img.onload = () => ctx.drawImage(img, 0, 0);
+      }
+    });
+
+    redoBtn.addEventListener('click', () => {
+      if (historyIndex < history.length - 1) {
+        historyIndex++;
+        const img = new Image();
+        img.src = history[historyIndex];
+        img.onload = () => ctx.drawImage(img, 0, 0);
+      }
+    });
+
+    // Download
+    downloadBtn.addEventListener('click', () => {
+      if (!image) {
+        alert('Please upload an image first.');
+        return;
+      }
+      const link = document.createElement('a');
+      link.download = 'edited-image.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+
+    // Share
+    shareBtn.addEventListener('click', () => {
+      if (!image) {
+        alert('Please upload an image first.');
+        return;
+      }
+      const dataUrl = canvas.toDataURL('image/png');
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(dataUrl)}`;
+      window.open(shareUrl, '_blank');
+    });
+
+    // Layer Gallery
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    galleryItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const type = item.getAttribute('data-type');
+        if (type === 'image') {
+          const src = item.getAttribute('data-src');
+          addImageLayer(src);
+        } else if (type === 'text') {
+          const text = item.getAttribute('data-text');
+          addTextLayer(text);
+        }
+      });
+    });
+
+    // Add image layer
+    function addImageLayer(src) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        const layer = document.createElement('div');
+        layer.className = 'layer';
+        layer.style.position = 'absolute';
+        layer.style.left = '50%';
+        layer.style.top = '50%';
+        layer.style.transform = 'translate(-50%, -50%)';
+        layer.innerHTML = `<img src="${src}" alt="Layer">`;
+        document.querySelector('.canvas-container').appendChild(layer);
+        makeMoveableAndResizable(layer);
+      };
+    }
+
+    // Add text layer
+    function addTextLayer(text) {
+      const layer = document.createElement('div');
+      layer.className = 'layer';
+      layer.style.position = 'absolute';
+      layer.style.left = '50%';
+      layer.style.top = '50%';
+      layer.style.transform = 'translate(-50%, -50%)';
+      layer.style.color = '#000';
+      layer.style.fontSize = '20px';
+      layer.style.fontFamily = 'Arial';
+      layer.style.cursor = 'grab';
+      layer.innerText = text;
+      document.querySelector('.canvas-container').appendChild(layer);
+      makeMoveableAndResizable(layer);
+    }
+
+    // Make layers moveable and resizable
+    function makeMoveableAndResizable(element) {
+      interact(element)
+        .draggable({
+          inertia: true,
+          modifiers: [
+            interact.modifiers.restrictRect({
+              restriction: 'parent',
+              endOnly: true
+            })
+          ],
+          autoScroll: true,
+          onmove: dragMoveListener
+        })
+        .resizable({
+          edges: { left: true, right: true, bottom: true, top: true },
+          modifiers: [
+            interact.modifiers.restrictEdges({
+              outer: 'parent'
+            }),
+            interact.modifiers.restrictSize({
+              min: { width: 50, height: 50 }
+            })
+          ],
+          inertia: true
+        })
+        .on('resizemove', function (event) {
+          const target = event.target;
+          target.style.width = `${event.rect.width}px`;
+          target.style.height = `${event.rect.height}px`;
+        });
+
+      function dragMoveListener(event) {
+        const target = event.target;
+        const x = (parseFloat(target.style.left) || 0) + event.dx;
+        const y = (parseFloat(target.style.top) || 0) + event.dy;
+        target.style.left = `${x}px`;
+        target.style.top = `${y}px`;
+      }
+    }
+  </script>
+</body>
+</html>
